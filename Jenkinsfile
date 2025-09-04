@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'mcr.microsoft.com/playwright:v1.55.0-focal'
+            image 'mcr.microsoft.com/playwright:v1.55.0-focal-20230905'
             // Increase shared memory for browser tests + cache playwright browsers
             args '--shm-size=2g -v $HOME/.cache/ms-playwright:/home/jenkins/.cache/ms-playwright'
         }
