@@ -1,88 +1,84 @@
 pipeline {
-  agent any
+    agent {
+        docker {
+            image 'mcr.microsoft.com/playwright:v1.55.0-focal'
+            args '--shm-size=2g -v $HOME/.cache/ms-playwright:/home/jenkins/.cache/ms-playwright'
+        }
+    }
 
-  options {
-    timestamps()
-  }
+    options {
+        timestamps()
+    }
 
-  tools {
-    nodejs 'nodejs'
-  }
+    stages {
 
-  stages {
+        stage('Check Prerequisites') {
+            steps {
+                wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
+                    script {
+                        echo "Checking Node.js version..."
+                        sh 'node -v'
 
-    stage('Check Prerequisites') {
-      steps {
-        wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-          script {
-            echo "Checking prerequisites..."
-            echo "Node.js version:"
-            sh 'node -v'
-            echo "NPM version:"
-            sh 'npm -v'
-            echo "Checking Playwright installation..."
-            def playwrightCheck = sh(script: 'npx playwright --version', returnStatus: true)
-            if (playwrightCheck != 0) {
-              error("Playwright is not installed or not accessible. Please install it before proceeding.")
-            } else {
-              sh 'npx playwright --version'
-              echo "Playwright is available."
+                        echo "Checking NPM version..."
+                        sh 'npm -v'
+
+                        echo "Checking Playwright installation..."
+                        sh 'npx playwright --version'
+                        echo "Playwright is available."
+                    }
+                }
             }
-          }
         }
-      }
+
+        stage('Install Dependencies') {
+            steps {
+                wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
+                    echo "Installing project dependencies..."
+                    sh 'npm ci'
+
+                    echo "Installing Playwright browsers (cached)..."
+                    sh 'npx playwright install --with-deps'
+                }
+            }
+        }
+
+        stage('Run Playwright Tests') {
+            steps {
+                wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
+                    echo "Running Playwright tests..."
+                    sh 'npx playwright test --reporter=html'
+                }
+            }
+        }
+
+        stage('Publish Test Report') {
+            steps {
+                wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
+                    echo "Publishing Playwright HTML report..."
+                    publishHTML([
+                        reportDir: 'playwright-report',
+                        reportFiles: 'index.html',
+                        reportName: 'Playwright Report',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true,
+                        allowMissing: true
+                    ])
+                    echo "Report available in Jenkins: Playwright Report tab."
+                }
+            }
+        }
     }
 
-    stage('Install Dependencies') {
-      steps {
-        wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-          echo "Installing project dependencies..."
-          sh 'npm ci'
-          echo "Installing Playwright browsers..."
-          sh 'npx playwright install'
-          echo "Installing required Linux dependencies for browsers..."
-          sh 'npx playwright install-deps'
+    post {
+        success {
+            wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
+                echo "Pipeline completed successfully!"
+            }
         }
-      }
-    }
-
-    stage('Run Playwright Tests') {
-      steps {
-        wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-          echo "Running Playwright tests..."
-          sh 'npx playwright test --reporter=html'
+        failure {
+            wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
+                echo "Pipeline failed. Check stage logs above."
+            }
         }
-      }
     }
-
-    stage('Publish Test Report') {
-      steps {
-        wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-          echo "Publishing Playwright HTML report..."
-          publishHTML([
-            reportDir: 'playwright-report',
-            reportFiles: 'index.html',
-            reportName: 'Playwright Report',
-            keepAll: true,
-            alwaysLinkToLastBuild: true,
-            allowMissing: true
-          ])
-          echo "Report available in Jenkins: Playwright Report tab."
-        }
-      }
-    }
-  }
-
-  post {
-    success {
-      wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-        echo "Pipeline completed successfully!"
-      }
-    }
-    failure {
-      wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-        echo "Pipeline failed. Please check the stage logs above."
-      }
-    }
-  }
 }
