@@ -1,5 +1,8 @@
 pipeline {
   agent any
+  tools {
+    nodejs 'nodejs'
+  }
 
   stages {
     stage('Check Prerequisites') {
@@ -45,3 +48,4 @@ pipeline {
     }
   }
 }
+
