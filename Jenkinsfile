@@ -2,83 +2,73 @@ pipeline {
     agent {
         docker {
             image 'mcr.microsoft.com/playwright:v1.55.0-focal'
+            // Increase shared memory for browser tests + cache playwright browsers
             args '--shm-size=2g -v $HOME/.cache/ms-playwright:/home/jenkins/.cache/ms-playwright'
         }
     }
 
     options {
         timestamps()
+        ansiColor('xterm')   // instead of wrapping every stage
     }
 
     stages {
 
         stage('Check Prerequisites') {
             steps {
-                wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-                    script {
-                        echo "Checking Node.js version..."
-                        sh 'node -v'
+                script {
+                    echo "Checking Node.js and NPM versions..."
+                    sh 'node -v && npm -v'
 
-                        echo "Checking NPM version..."
-                        sh 'npm -v'
-
-                        echo "Checking Playwright installation..."
-                        sh 'npx playwright --version'
-                        echo "Playwright is available."
-                    }
+                    echo "Checking Playwright CLI..."
+                    sh 'npx playwright --version'
                 }
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-                    echo "Installing project dependencies..."
-                    sh 'npm ci'
+                echo "Installing project dependencies with npm ci..."
+                sh 'npm ci'
 
-                    echo "Installing Playwright browsers (cached)..."
-                    sh 'npx playwright install --with-deps'
-                }
+                echo "Installing Playwright browsers (using cache)..."
+                sh 'npx playwright install --with-deps'
             }
         }
 
         stage('Run Playwright Tests') {
             steps {
-                wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-                    echo "Running Playwright tests..."
-                    sh 'npx playwright test --reporter=html'
-                }
+                echo "Running Playwright tests..."
+                sh 'npx playwright test --reporter=html,junit'
             }
         }
 
         stage('Publish Test Report') {
             steps {
-                wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-                    echo "Publishing Playwright HTML report..."
-                    publishHTML([
-                        reportDir: 'playwright-report',
-                        reportFiles: 'index.html',
-                        reportName: 'Playwright Report',
-                        keepAll: true,
-                        alwaysLinkToLastBuild: true,
-                        allowMissing: true
-                    ])
-                    echo "Report available in Jenkins: Playwright Report tab."
-                }
+                echo "Publishing Playwright HTML report..."
+                publishHTML([
+                    reportDir: 'playwright-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Playwright Report',
+                    keepAll: true,
+                    alwaysLinkToLastBuild: true,
+                    allowMissing: true
+                ])
+
+                junit 'test-results/**/*.xml' // picks up junit output from Playwright
             }
         }
     }
 
     post {
         success {
-            wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-                echo "Pipeline completed successfully!"
-            }
+            echo "Pipeline completed successfully!"
         }
         failure {
-            wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-                echo "Pipeline failed. Check stage logs above."
-            }
+            echo "Pipeline failed. Check logs above."
+        }
+        always {
+            cleanWs()  // cleanup workspace after each run
         }
     }
 }
