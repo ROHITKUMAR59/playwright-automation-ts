@@ -1,0 +1,75 @@
+
+<h2 style="color:#ffffff; background-color:#f7f507; padding:12px 15px; border-radius:6px; text-align:center; font-size:20px;">
+<strong>Playwright Test Automation</strong>
+</h2>
+
+<table style="border-collapse:collapse; width:100%; margin-top:15px; font-size:14px;" border="1">
+<tr style="background-color:#ffffff; color:white; font-size:15px;">
+<th style="padding:10px; text-align:left;"><b>Parameter</b></th>
+<th style="padding:10px; text-align:left;"><b>Value</b></th>
+</tr>
+
+<tr style="background-color:#3e4f61; color:white;">
+<td style="padding:10px;"><b>ENVIRONMENT</b></td>
+<td style="padding:10px;"><code>sys</code></td>
+</tr>
+
+<tr style="background-color:#1a2a3a; color:#88ffb0;">
+<td style="padding:10px;"><b>BRAND</b></td>
+<td style="padding:10px;"><code>ABC</code></td>
+</tr>
+
+<tr style="background-color:#3e4f61; color:white;">
+<td style="padding:10px;"><b>SUBDOMAIN</b></td>
+<td style="padding:10px;"><code>online1</code></td>
+</tr>
+
+<tr style="background-color:#1a2a3a; color:#88ffb0;">
+<td style="padding:10px;"><b>BRANCH_NAME</b></td>
+<td style="padding:10px;"><code>master</code></td>
+</tr>
+
+<tr style="background-color:#3e4f61; color:white;">
+<td style="padding:10px;"><b>TEST_TAGS</b></td>
+<td style="padding:10px;"><code>@E2E,@COM</code></td>
+</tr>
+
+<tr style="background-color:#1a2a3a; color:#88ffb0;">
+<td style="padding:10px;"><b>BROWSER</b></td>
+<td style="padding:10px;"><code>browse-config-file</code></td>
+</tr>
+
+<tr style="background-color:#3e4f61; color:white;">
+<td style="padding:10px;"><b>TEST_FOLDER</b></td>
+<td style="padding:10px;"><code>test/Motor/code</code></td>
+</tr>
+<!-- Optional parameters (match table colors) -->
+<tr style="background-color:#1a2a3a; color:#a5fb9;">
+<td style="padding:10px;"><b>INVERT_TAGS</b></td>
+<td style="padding:10px;"><code>@CDE,@FGH</code></td>
+</tr>
+<tr style="background-color:#3e4f61; color:white;">
+<td style="padding:10px;"><b>EXEC_COMMAND</b></td>
+<td style="padding:10px;">
+<code>cross-env BRAND=online1 ENV=sys npx playwright test --grep='@E2E|@COM' --grep-invert='@CDE|@FGH' --workers=1
+--project=chromium</code>
+</td>
+</tr>
+<tr style="background-color:#1a2a3a; color:#a5fb91;">
+<td style="padding:10px;"><b>ENABLE_DEBUG / ENABLE_TRACE</b></td>
+<td style="padding:10px;"><code>Optional</code></td>
+</tr>
+<tr style="background-color:#3e4f61; color:white;">
+<td style="padding:10px;"><b>WORKERS</b></td>
+<td style="padding:10px;"><code>1</code></td>
+</tr>
+</table>
+
+<h3 style="color:white; background-color:#ff7f50; padding:7px 10px; border-radius:4px; margin-top:15px; font-size:14px;">
+<strong>References</strong>
+</h3>
+<div style="padding:12px 18px; background-color:#2ba74d; border-radius:6px; display:inline-block; text-align:center;">
+<a href="https://github.com/ROHITKUMAR59/playwright-automation-ts" target="_blank" style="color:white; text-decoration:none; font-weight:bold; font-size:16px;">
+Code Repository
+</a>
+</div>
